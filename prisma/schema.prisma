@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model application {
+  id       BigInt  @id
+  company  String
+  link     String?
+  status   String? @default("Saved")
+  user_id  BigInt
+  role     String
+  hr       String
+  metadata Json
+  users    users   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "application_user_id_foreign")
+  notes    notes[]
+}
+
+model notes {
+  id             BigInt      @id
+  text           BigInt
+  application_id BigInt
+  application    application @relation(fields: [application_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "notes_application_id_foreign")
+}
+
+model users {
+  id          BigInt        @id
+  user_name   String
+  full_name   String
+  email       String
+  phone       String?
+  password    String
+  profile     String?
+  experience  BigInt?       @default(0)
+  bio         String?
+  application application[]
+}
