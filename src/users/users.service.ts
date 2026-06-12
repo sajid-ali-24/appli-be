@@ -2,12 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { prisma } from '../lib/prisma';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { HashService } from '../common/services/hash.service';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
+  constructor(private hashService: HashService) {}
+  async create(createUserDto: CreateUserDto) {
+    const payload = {
+      ...createUserDto,
+      password: await this.hashService.hash(createUserDto.password),
+    };
     return prisma.users.create({
-      data: createUserDto,
+      data: payload,
     });
   }
 
@@ -15,20 +21,26 @@ export class UsersService {
     return prisma.users.findMany();
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return prisma.users.findUnique({
       where: { id },
     });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  findByEmail(email: string) {
+    return prisma.users.findFirst({
+      where: { email },
+    });
+  }
+
+  update(id: string, updateUserDto: UpdateUserDto) {
     return prisma.users.update({
       where: { id },
       data: updateUserDto,
     });
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return prisma.users.delete({
       where: { id },
     });

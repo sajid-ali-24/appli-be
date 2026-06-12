@@ -1,6 +1,5 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -8,34 +7,34 @@ datasource db {
 }
 
 model application {
-  id       BigInt  @id
+  id       String  @id @default(cuid())
   company  String
   link     String?
   status   String? @default("Saved")
-  user_id  BigInt
+  user_id  String
   role     String
-  hr       String
-  metadata Json
+  hr       String?
+  metadata Json?
   users    users   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "application_user_id_foreign")
   notes    notes[]
 }
 
 model notes {
-  id             BigInt      @id
-  text           BigInt
-  application_id BigInt
+  id             String      @id @default(cuid())
+  text           String
+  application_id String
   application    application @relation(fields: [application_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "notes_application_id_foreign")
 }
 
 model users {
-  id          BigInt        @id
-  user_name   String
+  id          String        @id @default(cuid())
+  user_name   String        @unique
   full_name   String
-  email       String
-  phone       String?
+  email       String        @unique
+  phone       String?       @unique
   password    String
   profile     String?
-  experience  BigInt?       @default(0)
+  experience  Int?          @default(0)
   bio         String?
   application application[]
 }
